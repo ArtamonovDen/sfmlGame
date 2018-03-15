@@ -1,218 +1,249 @@
-#include "Ovo.h"
-#include "Player.h"
-#include <SFML/Graphics.hpp>
+#include "Matrix.h"
+#include "Vector.h"
 #include <iostream>
+#include <algorithm>
 
-int main()
-{
-	//Ovo aHero("darthvader.png");
-	//Player Hero("darthvader.png", 4, 4, 1, 2, 50,50);
+using core::Matrix;
+using core::Vector;
 
-	sf::RenderWindow window(sf::VideoMode(400, 400), " Abandon all hope, ye who enter here");
-	sf::CircleShape shape(200.f);
-	shape.setFillColor(sf::Color::Red);
 
-	int c_x = 32;
-	int c_y = 48;
+Vector gauss(Matrix A, Vector B){
+	//A - matrix, system of equations
+	//B - vector, results
 
-	sf::Texture texture;
-	texture.loadFromFile("darthvader.png");
+	bool ex_flag = 0;
+	if (!( (A.row == A.col) &&(A.col == B.size()) )){
+		std::cout << "error. unsuitable dimensions" << std::endl;
+		ex_flag = 1;
+	}
 	
-	sf::Sprite sprite;
-	sprite.setTexture(texture);
-	sprite.setPosition(50, 50);
-	sprite.setTextureRect(sf::IntRect(0, 0, c_x, c_y));
 
-	// load a 32x32 rectangle that starts at (10, 10)	
-	// load a 32x32 rectangle that starts at (10, 10)
-	//heroSprite.setTextureRect(sf::IntRect(0, 0, 32, 48));
-	//heroSprite.setPosition(sf::Vector2f(100, 100));
-	//heroSprite.setScale(sf::Vector2f(1.2f, 1.2f));
-	//sprite.setColor(sf::Color(0, 255, 0)); // green
-	//sprite.setColor(sf::Color(255, 255, 255, 60));
+	//CHECK SIZE
 
+	//STRAIGHT RUN
+	
+	for (int k = 0; (k < A.row - 1)&&(!ex_flag); k++){
+		if (A.mat[k][k] == 0){
+			int l = k;
 
-	sf::Clock clock;
-	float curFrame = 0;
+			do{
+				l++;
+				if ((A.mat[l][k] == 0) && (l == A.row-1)){
+					std::cout << "error in parameter deletion. The original system's rank is 0 " << std::endl;
+					ex_flag = 1;
+					break;
+				}
+			} 
+			while (A.mat[l][k] == 0);
 
-	while (window.isOpen())
-	{
-		float time = clock.getElapsedTime().asMicroseconds();
-		clock.restart();
-		//std::cout << time << std::endl;
-		time = time /200; //Game speed
-		
-		sf::Event event;
-		while (window.pollEvent(event))
-		{
-			if (event.type == sf::Event::Closed || (event.type == sf::Event::KeyPressed && event.key.code ==
-				sf::Keyboard::Escape)){
-				window.close();
+			if (ex_flag)
 				break;
-			}
-			/*if (event.type == sf::Event::LostFocus){
-				std::cout << "Go back, faggot" << std::endl;
-			}
-			if (event.type == sf::Event::GainedFocus){
-				std::cout << "Alright" << std::endl;
-			}*/
-			//if (event.type == sf::Event::TextEntered)
-			//{
-			//	if (event.text.unicode < 128)
-			//		std::cout << "ASCII character typed: " << static_cast<char>(event.text.unicode) << std::endl;
-			//}
-			//if (event.type == sf::Event::MouseWheelMoved)
-			//{
-			//	std::cout << "wheel movement: " << event.mouseWheel.delta << std::endl;
-			//	std::cout << "mouse x: " << event.mouseWheel.x << std::endl;
-			//	std::cout << "mouse y: " << event.mouseWheel.y << std::endl;
-			//}
 
-			//if (event.type == sf::Event::MouseButtonPressed)
-			//{
-			//	if (event.mouseButton.button == sf::Mouse::Right)
-			//	{
-			//		std::cout << "the right button was pressed" << std::endl;
-			//		std::cout << "mouse x: " << event.mouseButton.x << std::endl;
-			//		std::cout << "mouse y: " << event.mouseButton.y << std::endl;
-			//	}
-			//}
-
-			//if (event.type == sf::Event::MouseMoved)
-			//{
-			//	std::cout << "new mouse x: " << event.mouseMove.x << std::endl;
-			//	std::cout << "new mouse y: " << event.mouseMove.y << std::endl;
-			//}
-			//if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-			//{
-			//	// left key is pressed: move our character
-			//	std::cout << "qqq" << std::endl;
-			//}
-			//if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-			//{
-			//	// left mouse button is pressed: shoot
-			//	//gun.fire();
-			//}
-					
-
-
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-				{
-					curFrame += 0.1*time;
-					if (curFrame >= 4) curFrame = 0;
-
-					sprite.move(-0.1*time, 0);
-					sprite.setTextureRect(sf::IntRect(c_x*int(curFrame), c_y, c_x, c_y));
-				}
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-					curFrame += 0.1*time;
-					if (curFrame >= 4) curFrame = 0;
-					sprite.move(0.1*time, 0);
-					sprite.setTextureRect(sf::IntRect(c_x*int(curFrame), 2 * c_y, c_x, c_y));
-				}
-
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-				{
-					curFrame += 0.1*time;
-					if (curFrame >= 4) curFrame = 0;
-
-					sprite.move(0, -0.1*time);
-					sprite.setTextureRect(sf::IntRect(c_x*int(curFrame), 3 * c_y, c_x, c_y));
-				}
-				if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-				{
-					curFrame += 0.1*time;
-					if (curFrame >= 4) curFrame = 0;
-
-					sprite.move(0, 0.1*time);
-
-					sprite.setTextureRect(sf::IntRect(c_x*int(curFrame), 0, c_x, c_y));
-				}
-
-			
-		}
-		
-
-				//if (event.type == sf::Event::KeyPressed){
-
-
-				//	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left) || sf::Keyboard::isKeyPressed(sf::Keyboard::A))
-				//	{
-				//		Hero.dir = 1;
-				//		//Hero.update(1, time);
-				//	}
-				//	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right) || sf::Keyboard::isKeyPressed(sf::Keyboard::D)){
-				//		Hero.dir = 0;
-				//		//Hero.update(0, time);
-				//	}
-
-				//	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up) || sf::Keyboard::isKeyPressed(sf::Keyboard::W))
-				//	{
-				//		Hero.dir = 3;
-				//		//Hero.update(3, time);
-				//	}
-				//	if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down) || sf::Keyboard::isKeyPressed(sf::Keyboard::S))
-				//	{
-				//		Hero.dir = 2;
-				//		//Hero.update(2, time);
-				//	}
-				//	
-
-				//}
-				//Hero.update(1, time);
-
-				/*if (event.type == sf::Event::MouseButtonPressed)
-				{
-					if (event.mouseButton.button == sf::Mouse::Left)
-					{
-						heroSprite.setColor(sf::Color::Red);
-					}
-					if (event.mouseButton.button == sf::Mouse::Right)
-					{
-						heroSprite.setColor(sf::Color(255, 255, 255));
-					}
-				}*/
-
-
-
-			
-			//Hero.m_sprite.setPosition(100,100);
-			//Hero.m_texture.update(window);
-			window.clear();
-			window.draw(shape);
-			window.draw(sprite);
-			//window.draw(Hero.m_sprite);
-			window.display();
-
+			A.swapRows(k, l);
+			std::swap(B.vec[l],  B.vec[k]);
 		}
 
 
+		for (int i = k + 1; i < A.row; i++){
+			//catcher?
+
+			//change rows::find the most [k,k]
+			/*
+			double maxK = 0;
+			for(int r=i; r<= A.col; r++){
+			if (A[r][k]>A[maxK][k])
+			maxK = r;
+			}
+			//next do things for r
+
+			*/
+			if (A.mat[k][k] != 0){//?? catcher and change order
+				double m = A.mat[i][k] / A.mat[k][k];
+				for (int j = 0; j < A.col; j++){//from 0?
+					A.mat[i][j] -= m*A.mat[k][j];
+				}
+				B.vec[i] -= m*B.vec[k]; //Change the B-vector
+				std::cout << std::endl;
+				A.print();
+				std::cout << std::endl;
+				B.print();
+			}
+			else{
+			}
+		}
+	}
+
+	if (A.mat[A.row-1][A.col-1]==0){
+		std::cout << "Error in [n,n] computing. The rank of matrix is 0" << std::endl;
+		ex_flag = 1;
+	}
+
+	if (!ex_flag){
+		Vector X(A.row);
+		X.vec[A.row - 1] = B.vec[A.row - 1] / A.mat[A.row - 1][A.col - 1];
+		int i = A.row - 2;
+		while (i >= 0){
+			double s = 0;
+			for (int j = i + 1; j < A.col; j++)
+				s += A.mat[i][j] * X.vec[j];
+			X.vec[i] = (B.vec[i] - s) / A.mat[i][i];
+			i -= 1;
+		}
+		X.print();
+		return X;
+	}
+	else{
+		return{};
+	}
 
 
-		
+
+
+}
+
+//USE A FUNCTION INSTEAD OF THIS
+//COMPUTING Y_HAT
+
+//Y_hat = W*X; ???
+//X is a vector for 1-dimensional objects. But for multidim onew we need MATRIX X!!!
+
+//class Gradient{
+//public:
+//	core::Vector operator() (core::Vector Y, core::Vector X,  core::Vector Y_hat, core::Vector& W) const{
+//		core::Vector G(W.size());
+//
+//		for (int i = 0; i < W.size(); i++){ 
+//
+//			//Count  one partial derivative
+//			double s = 0;
+//			for (int j = 0; j < Y.size(); j++){
+//				s += (Y_hat.vec[j] - Y.vec[j])*X.vec[j];
+//			}
+//			G.vec[i] = s;
+//		}
+//
+//		return G;
+//		//return gradient f(X);
+//	}
+//
+//
+//};
+//
+//core::Vector gradient(core::Vector W, core::Vector& X){
+//
+//}
+
+core::Vector gradient(core::Vector);
+//Ãðàäèåíò äëÿ âåêòîðà Õ , ãðàäèåíò äëÿ ìàòðèöû ïðèçíàêîâ
+
+//core::Vector gradientDescent(core::Vector W, core::Vector Y, core::Matrix H){
+//	double eps = 0.001;
+//	core::Vector E(Y.size());
+//	E.init_with(eps);
+//
+//	double k = 0.4;
+//	//ìåòîä íàèñêîð ñïóñêà äëÿ k
+//	core::Vector prevW(W);
+//	core::Vector Y_hat(Y.size());
+//	core::Vector deltaY(Y.size());
+//	int it = 0;
+//	while (it <= 100){//?
+//
+//		core::Vector Grad(W.size());
+//		Y_hat = H*W;
+//		W.transpose = 1;
+//		deltaY = Y - Y_hat;
+//		W.transpose = 0;
+//		if (deltaY<E){
+//			break;
+//		}		
+//
+//		//Grad = H*deltaY;//FOR H(X). WHATS FOR H(F(X))?
+//		//Grad = 2 * H_T*(H*W - Y)
+//
+//		W = prevW - gradient(prevW) *k;	
+//
+//		it++;
+//	}
+//
+//	return W;
+//
+//}
+
+
+//FOR MATRIX H OF OBJECTS
+//core::Vector gradientDescent(core::Vector W, core::Vector Y, core::Matrix H){
+//	double eps = 0.001;
+//	core::Vector E(Y.size());
+//	E.init_with(eps);
+//
+//	int k = 0.4;
+//	//ìåòîä íàèñêîð ñïóñêà äëÿ k
+//	core::Vector prevW(W);
+//	core::Vector Y_hat(Y.size());
+//	int it = 0;
+//	while (it<=100){//?
+//		W = prevW - gradient(prevW) *k;
+//		Y_hat = H * W;
+//		if ((Y - Y_hat)<E){
+//			break;
+//		}
+//
+//		it++;
+//	}
+//
+//	return W;
+//
+//}
+
+int main(){
+	std::string path = "file.txt";
+	Matrix A(path);
+	A.print();
+	//std::cout << A[1][1] << std::endl;
+
+	core::Vector V("file2.txt");
+	V.print();
+
+	//A.swapRows(1,2);
+	//A.print();
+
+	/*Matrix X = gauss(A, V);
+	X.print();*/
+	//gauss(A, V);
+	
+	//A + A;
+
+	std::cin.get();
+
+//	core::Vector V("file2.txt");
+//	V.print();
+//	*V[2] = 11;
+//	V.print();
+////	std::cout << std::endl << V[0] << std::endl;
+//	//Gradient g;
+//	//gradientDescent(V, g);
+//
+//	//ÊÂÀÄÐÀÒÛÅ ÑÊÎÁÊÈ ÒÎËÜÊÎ ÂÎÇÂÐÀÙÀÞÒ ÝËÅÌÅÍÒ ÈËÈ ÄÅËÀÞÒ ÂÎÇÌÎÆÍÛÌ ÅÃÎ ÈÇÌÅÍÅÍÈÅ??
+//	std::cout << std::endl;
+//	//(A*V).print();
+//	//(A*A).print();
+//
+//	//(A.T() * V).print();
+//	A + A;
+
+	A.T().print();
+
+	V.T().print();
+
+	std::cin.get();
 	return 0;
 }
 
-//sf::Event event;
-//
-//// while there are pending events...
-//while (window.pollEvent(event))
-//{
-//	// check the type of the event...
-//	switch (event.type)
-//	{
-//		// window closed
-//	case sf::Event::Closed:
-//		window.close();
-//		break;
-//
-//		// key pressed
-//	case sf::Event::KeyPressed:
-//		...
-//			break;
-//
-//		// we don't process other types of events
-//	default:
-//		break;
-//	}
-//}
+
+//OPERATORS!!
+
+//×òî-òî ñ ðàâåíñòâîì íóëþ â ìåòîäå Ãàóññà
+//MODIF IN GAUSS
+//IN GAUSS: N=A.row-1 ??
+//CHECK DIMENSION INSTEAD OF CHECKING ROW AND COL!
